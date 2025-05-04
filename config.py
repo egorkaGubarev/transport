@@ -10,5 +10,5 @@ d_depots = np.array([1, 2, np.sqrt(5), 1])
 
 m_budget = 50000
 num_reads = 10000
-num_reads_d_wave = 100
+num_reads_d_wave = 1000
 b = 10

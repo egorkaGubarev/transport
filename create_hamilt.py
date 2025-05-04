@@ -26,10 +26,10 @@ def create_continuity_for_vehicle(stations, b, x, mu, eta, k):
         constrict += b * (np.sum(x[k, :, i]) + mu[k, i] - np.sum(x[k, i, :]) - eta[k, i]) ** 2
     return constrict
 
-def create_single_end(b, eta, vehicles):
+def create_single_end(b, eta, slack, vehicles):
     constrict = 0
     for k in range(vehicles):
-        constrict += b * (1 - np.sum(eta[k])) ** 2
+        constrict += b * (1 - np.sum(eta[k]) - slack[k]) ** 2
     return constrict
 
 def create_single_in(b, stations, x, mu):
@@ -44,10 +44,10 @@ def create_single_out(b, stations, x, eta):
         constrict += b * (1 - (np.sum(x[:, i, :]) + np.sum(eta[:, i]))) ** 2
     return constrict
 
-def create_single_start(b, mu, vehicles):
+def create_single_start(b, mu, slack, vehicles):
     constrict = 0
     for k in range(vehicles):
-        constrict += b * (1 - np.sum(mu[k])) ** 2
+        constrict += b * (1 - np.sum(mu[k]) - slack[k]) ** 2
     return constrict
 
 def create_sub_tour(subset_to_index, x, slack, b, debug=False):

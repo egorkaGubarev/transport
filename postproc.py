@@ -20,12 +20,12 @@ def store_x(solution, size):
 def store_lambda(solution, subset_to_index):
     slack = []
     for subset, index in subset_to_index.items():
-        slack.append(store_labda_for_subset(len(subset), index, solution))
+        slack.append(store_vector('lambda_' + str(index), utils.count_slack_amount(len(subset)), solution))
     return slack
 
-def store_labda_for_subset(cardin, subset_index, solution):
+def store_vector(name, length, solution):
     slack = []
-    prefix = 'lambda_' + str(subset_index) + '_'
-    for l in range(utils.count_slack_amount(cardin)):
+    prefix = name + '_'
+    for l in range(length):
         slack.append(solution[prefix + str(l)])
     return slack
