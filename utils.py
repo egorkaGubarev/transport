@@ -1,4 +1,9 @@
+import dimod
+import neal
 import numpy as np
+
+import create_hamilt
+import postproc
 
 def count_visual_matrix(matrix, name_to_index):
     variables = len(name_to_index)
@@ -80,6 +85,30 @@ def force_solution(solution, my_solution):
         else:
             solution[variable] = 0
     return solution
+
+def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b, d_depots, d_stations, subset_to_index):
+    best_solution = None
+    best_target = 100
+    for solution_dict in neal.SimulatedAnnealingSampler().sample(dimod.BQM(matrix, 'BINARY'),
+                                                                 num_reads=num_reads):
+        mu = postproc.store_matrix('mu', solution_dict, (vehicles, stations))
+        eta = postproc.store_matrix('eta', solution_dict, (vehicles, stations))
+        x = postproc.store_x(solution_dict, (vehicles, stations, stations))
+        slack = postproc.store_lambda(solution_dict, subset_to_index)
+        slack_start = postproc.store_vector('slack_start', vehicles, solution_dict)
+        slack_end = postproc.store_vector('slack_end', vehicles, solution_dict)
+        single_out = create_hamilt.create_single_out(b, stations, x, eta)
+        single_in = create_hamilt.create_single_in(b, stations, x, mu)
+        single_start = create_hamilt.create_single_start(b, mu, slack_start, vehicles)
+        single_end = create_hamilt.create_single_end(b, eta, slack_end, vehicles)
+        continuity = create_hamilt.create_continuity(stations, b, x, mu, eta, vehicles)
+        sub_tour = create_hamilt.create_sub_tour(subset_to_index, x, slack, b)
+        if single_out + single_in + single_start + single_end + continuity + sub_tour == 0:
+            target = create_hamilt.create_target(x, mu, eta, d_stations, d_depots, vehicles)
+            if target < best_target:
+                best_target = target
+                best_solution = solution_dict
+    return best_solution, best_target
 
 def print_dict(data):
     for variable, value in data.items():
