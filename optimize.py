@@ -13,8 +13,8 @@ index_to_name = {}
 
 mu = create_variables.create_matrix('mu', (config.stations, config.vehicles), name_to_index, index_to_name)
 eta = create_variables.create_matrix('eta', (config.stations, config.vehicles), name_to_index, index_to_name)
-x = create_variables.create_tensor( (config.stations, config.stations, config.vehicles),
-                                    name_to_index, index_to_name)
+x = create_variables.create_tensor((config.stations, config.stations, config.vehicles),
+                                   name_to_index, index_to_name)
 slack, subset_to_index, index_to_subset = create_variables.create_slack(config.stations, name_to_index, index_to_name)
 
 target = create_hamilt.create_target(x, mu, eta, config.d_stations, config.d_depots, config.vehicles)
