@@ -18,7 +18,7 @@ slack_end = create_variables.create_vector('slack_end', config.vehicles, name_to
 slack_capac = create_variables.create_slack_matrix('slack_capac', config.vehicles, config.capac,
                                                    name_to_index, index_to_name)
 
-target = create_hamilt.create_target(x, mu, eta, config.d_stations, config.d_depots, config.vehicles)
+target = create_hamilt.create_target(x, mu, eta, config.d_stations, config.d_depots, config.gamma, config.vehicles)
 single_out = create_hamilt.create_single_out(config.b, config.stations, x, eta)
 single_in = create_hamilt.create_single_in(config.b, config.stations, x, mu)
 single_start = create_hamilt.create_single_start(config.b, mu, slack_start, config.vehicles)
@@ -32,7 +32,7 @@ matrix, _ = (target + single_out + single_in + single_start +
              single_end + continuity + sub_tour + demand).compile().to_qubo()
 solution, target = utils.optimize_with_d_wave(matrix, config.num_reads_d_wave, config.vehicles, config.stations,
                                               config.b, config.d_depots, config.d_stations,
-                                              config.capac, config.demand, subset_to_index)
+                                              config.capac, config.demand, config.gamma, subset_to_index)
 
 print(f'Routes: {utils.find_route(solution, config.vehicles, config.stations)}')
 print(f'Target: {np.round(target, 2)}')

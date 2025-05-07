@@ -89,12 +89,12 @@ def create_sub_tour(subset_to_index, x, slack, b, debug=False):
     return constrict
 
 
-def create_target(x, mu, eta, d_stations, d_depots, vehicles):
+def create_target(x, mu, eta, d_stations, d_depots, gamma, vehicles):
     target = 0
     for k in range(vehicles):
-        target += create_target_for_vehicle(x, mu, eta,  d_stations, d_depots, k)
+        target += create_target_for_vehicle(x, mu, eta,  d_stations, d_depots, gamma, k)
     return target
 
 
-def create_target_for_vehicle(x, mu, eta, d_stations, d_depots, k):
-    return np.sum(d_stations * x[k]) + np.sum(d_depots * (mu[k] + eta[k]))
+def create_target_for_vehicle(x, mu, eta, d_stations, d_depots, gamma, k):
+    return np.sum(d_stations * x[k]) + np.sum(np.matmul(gamma[k], d_depots) * (mu[k] + eta[k]))

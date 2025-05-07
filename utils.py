@@ -98,7 +98,7 @@ def force_solution(solution, my_solution):
 
 
 def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b,
-                         d_depots, d_stations, capac, demand,  subset_to_index):
+                         d_depots, d_stations, capac, demand, gamma,  subset_to_index):
     best_solution = None
     best_target = 100
     for solution_dict in neal.SimulatedAnnealingSampler().sample(dimod.BQM(matrix, 'BINARY'),
@@ -119,7 +119,7 @@ def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b,
         sub_tour = create_hamilt.create_sub_tour(subset_to_index, x, slack, b)
         demand_constrict = create_hamilt.create_demand(x, eta, demand, stations, slack_capac, capac, vehicles, b)
         if single_out + single_in + single_start + single_end + continuity + sub_tour + demand_constrict == 0:
-            target = create_hamilt.create_target(x, mu, eta, d_stations, d_depots, vehicles)
+            target = create_hamilt.create_target(x, mu, eta, d_stations, d_depots, gamma, vehicles)
             if target < best_target:
                 best_target = target
                 best_solution = solution_dict

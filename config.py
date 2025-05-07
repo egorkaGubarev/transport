@@ -6,7 +6,10 @@ d_stations = np.array([[0, 1, np.sqrt(2), 2],
                        [1, 0, 1, 3],
                        [np.sqrt(2), 1, 0, np.sqrt(10)],
                        [2, 3, np.sqrt(10), 0]])
-d_depots = np.array([1, 2, np.sqrt(5), 1])
+gamma = np.array([[1, 0],
+                  [0, 1]])
+d_depots = np.array([[1, 2, np.sqrt(5), 1],
+                     [2, 1, np.sqrt(2), 4]])
 demand = np.array([4, 2, 1, 3])
 capac = np.array([4, 6])
 
