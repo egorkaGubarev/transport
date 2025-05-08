@@ -48,6 +48,31 @@ def create_demand_for_vehicle(x, eta, demand, stations, k, slack, capac):
     return constrict - capac
 
 
+def create_depot_capac(x, demand, eta, gamma, slack, stations, depots, vehicles, depot_capac, b):
+    constrict = 0
+    for d in range(depots):
+        constrict += b * create_depot_capac_for_depot(x, demand, eta, gamma, slack[d],
+                                                      stations, vehicles, depot_capac, d) ** 2
+    return constrict
+
+
+def create_depot_capac_for_depot(x, demand, eta, gamma, slack, stations, vehicles, depot_capac, d):
+    constrict = 0
+    for k in range(vehicles):
+        constrict += create_depot_capac_for_vehicle(x, demand, eta, gamma, stations, k, d)
+    for digit in range(len(slack)):
+        constrict += 2 ** digit * slack[digit]
+    return constrict - depot_capac[d]
+
+
+def create_depot_capac_for_vehicle(x, demand, eta, gamma, stations, k, d):
+    constrict = 0
+    for j in range(stations):
+        constrict += gamma[k, d] * np.sum(demand * x[k, :, j])
+    constrict += gamma[k, d] * np.sum(demand * eta[k])
+    return constrict
+
+
 def create_single_end(b, eta, slack, vehicles):
     constrict = 0
     for k in range(vehicles):

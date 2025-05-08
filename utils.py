@@ -98,7 +98,7 @@ def force_solution(solution, my_solution):
 
 
 def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b,
-                         d_depots, d_stations, capac, demand, gamma,  subset_to_index):
+                         d_depots, d_stations, capac, demand, gamma, depot_capac, depots, subset_to_index):
     best_solution = None
     best_target = 100
     for solution_dict in neal.SimulatedAnnealingSampler().sample(dimod.BQM(matrix, 'BINARY'),
@@ -111,6 +111,8 @@ def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b,
         slack_end = postproc.store_vector('slack_end', vehicles, solution_dict)
         slack_capac = postproc.store_matrix('slack_capac', solution_dict,
                                             (vehicles, count_slack_amount(np.max(capac))))
+        slack_depot_capac = postproc.store_matrix('slack_depot_capac', solution_dict,
+                                                  (depots, count_slack_amount(np.max(depot_capac))))
         single_out = create_hamilt.create_single_out(b, stations, x, eta)
         single_in = create_hamilt.create_single_in(b, stations, x, mu)
         single_start = create_hamilt.create_single_start(b, mu, slack_start, vehicles)
@@ -118,7 +120,10 @@ def optimize_with_d_wave(matrix, num_reads, vehicles, stations, b,
         continuity = create_hamilt.create_continuity(stations, b, x, mu, eta, vehicles)
         sub_tour = create_hamilt.create_sub_tour(subset_to_index, x, slack, b)
         demand_constrict = create_hamilt.create_demand(x, eta, demand, stations, slack_capac, capac, vehicles, b)
-        if single_out + single_in + single_start + single_end + continuity + sub_tour + demand_constrict == 0:
+        depot_capac_constrict = create_hamilt.create_depot_capac(x, demand, eta, gamma, slack_depot_capac,
+                                                                 stations, depots, vehicles, depot_capac, b)
+        if (single_out + single_in + single_start + single_end +
+                continuity + sub_tour + demand_constrict + depot_capac_constrict == 0):
             target = create_hamilt.create_target(x, mu, eta, d_stations, d_depots, gamma, vehicles)
             if target < best_target:
                 best_target = target
